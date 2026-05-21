@@ -128,7 +128,7 @@ jobs:
             echo ""
             echo "# Push + tag để tự build release:"
             echo "git push --force-with-lease origin master"
-            echo "git tag v1.x.y-x3-vi && git push origin v1.x.y-x3-vi"
+            echo "git tag v1.x.y-x3-x4-vi && git push origin v1.x.y-x3-x4-vi"
             echo '```'
           } > /tmp/body.md
 

@@ -42,7 +42,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-x3-vi
+          name: firmware-x3-x4-vi
           path: .pio/build/gh_release/firmware.bin
           if-no-files-found: error
           retention-days: 30
