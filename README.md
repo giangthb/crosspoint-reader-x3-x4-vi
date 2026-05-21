@@ -1,271 +1,129 @@
-# CrossPoint Reader
+# CrossPoint Reader — Xteink X3 & X4 (Vietnamese)
 
-[![Fund contributors](https://img.shields.io/badge/%F0%9F%91%91_Fund_contributors-royalty.dev-BB953A?style=for-the-badge&labelColor=1a1a1a)](https://app.royalty.dev/crosspoint-reader/crosspoint-reader)
+Firmware CrossPoint cho máy đọc sách **Xteink X3 và X4** với hỗ trợ tiếng Việt đầy đủ (UI + font).
 
-CrossPoint is open-source e-reader firmware - community-built, fully hackable, free forever. It's maintained by a growing community of developers and readers who believe your device should do what you want - not what a manufacturer decided for you.
+> ⚠️ **Bản không chính thức.** Flash tự chịu rủi ro. Hãy backup partition stock trước khi flash.
 
-**Now running on:** ESP32C3-based Xteink [X4](https://www.xteink.com/products/xteink-x4) and [X3](https://www.xteink.com/products/xteink-x3).
+## Điểm đặc biệt
 
-![CrossPoint Reader running on Xteink device](./docs/images/cover.jpg)
+- ✅ **UI tiếng Việt** — 292 chuỗi đã dịch (menu, settings, dialog, thông báo). Upstream có 22 ngôn ngữ nhưng **chưa có tiếng Việt** — đây là điểm khác biệt chính của fork.
+- ✅ **Font UbuntuVietHoa** — hiển thị đủ dấu tiếng Việt ngay trên giao diện (không cần copy font vào SD).
+- ✅ **Hỗ trợ cả X3 lẫn X4** — base trên upstream `crosspoint-reader` 1.3.0, đã hỗ trợ chính thức **cả hai panel**: X4 (480×800) và X3 (528×792). Một bản firmware chạy cho cả hai máy.
+- ✅ **Đa ngôn ngữ** — ngoài tiếng Việt, giữ đủ 22 ngôn ngữ của upstream (EN, ES, FR, DE, IT, PT, RU, UK, PL, TR, ...) → tổng 23 ngôn ngữ.
+- ✅ **Patch riêng:** fix sleep screen không fill đủ màn hình khi dùng ảnh kích thước panel khác (X4 trên X3 hoặc ngược lại) — xem [Patches](#patches-riêng-của-fork-này). User xác nhận lỗi này **vẫn còn trên 1.3.0**, nên patch vẫn cần.
 
-## What can CrossPoint do?
+### Tính năng mới kế thừa từ upstream 1.3.0
 
-- **Reader engine**: EPUB 2/3 rendering with embedded-style option, image handling, hyphenation, kerning, chapter navigation, footnotes, go-to-percent, auto page turn, orientation control, focus reading, KOReader progress sync and more. 
+- **SD-card fonts (`.cpfont`)** — tự convert TTF/OTF thành font load từ SD, không cần reflash firmware (xem [Sau khi flash](#sau-khi-flash)).
+- **Tilt page turn (chỉ X3)** — lật trang bằng nghiêng máy.
+- **KOReader progress sync**, **WebDAV**, **OPDS browser** (tối đa 8 server, search, phân trang, tải trực tiếp).
+- **OTA update** từ GitHub releases, **EPUB Optimizer**, **WebSocket fast uploads**.
+- Nhiều theme (Classic, Lyra, Lyra Extended, RoundedRaff), remap nút trước/bên, điều khiển status bar.
 
-- **Various formats**: native handling for `.epub`, `.xtc/.xtch`, `.txt`, and `.bmp`.
+## Cách flash
 
-- **Screenshots.**
+> 🔒 **Máy bị khoá USB?** Một số máy Xteink mua từ store bên thứ ba (vd AliExpress) bị khoá flash USB từ nhà máy. Nếu trình duyệt không thấy thiết bị qua WebSerial, dùng **Xteink Unlocker** tại <https://crosspointreader.com/#unlock-tool> trước. Máy mua trực tiếp từ xteink.com **không** bị khoá.
 
-- **Custom fonts**: install your favorite fonts on the SD card.
+### Cách 1 — Web flasher (dễ nhất, khuyên dùng)
 
-- **Tilt page turn (X3 only)**.
+1. **Backup trước:** Vào <https://crosspointreader.com/#flash-tools>, chọn máy (**X3** hoặc **X4**), dùng phần backup để lưu partition stock về máy (để rollback nếu cần).
+2. Kết nối máy với máy tính qua USB-C, bật/wake máy.
+3. Trình duyệt: **Chrome / Edge** (Firefox không hỗ trợ WebSerial).
+4. Tải `firmware.bin` từ [Releases](../../releases/latest).
+5. Vào <https://crosspointreader.com/#flash-tools>, chọn đúng máy (X3 hoặc X4), chọn **"Custom .bin"**, upload `firmware.bin` vừa tải, flash.
+6. Rút USB và cắm lại để restart.
 
-- **Library workflow**: folder browser, hidden-file toggle, long-press delete, recent books, SD-cache management.
-
-- **Wireless workflows**:
-  
-  - File transfer web UI
-  - EPUB Optimizer
-  - Web settings UI/API (edit many device settings from browser)
-  - WebSocket fast uploads
-  - WebDAV handler
-  - AP mode (hotspot) and STA mode (join existing WiFi), both with QR helpers
-  - Calibre wireless connect flow
-  - OPDS browser with saved servers (up to 8), search, pagination, and direct download
-  - OTA update checks and installs from GitHub releases
-
-- **Customization**: multiple themes (Classic, Lyra, Lyra Extended, RoundedRaff), sleep screen modes, front/side button remapping, status bar controls, power-button behavior, refresh cadence, and more.
-
-- **Localization**: 22 UI languages and counting.
-
-### Coming soon:
-
-- RTL support — Arabic, Hebrew, and Farsi.
-
-- Bookmarks.
-
-- Dictionary lookup — inline word lookup without leaving the reader.
-
-- More themes.
-
-- Much more! stay tuned.
-
----
-
-## USB-locked devices (Xteink Unlocker)
-
-Some Xteink units purchased from third-party stores (e.g. AliExpress) ship with USB flashing locked from the factory.
-If your device is locked, you will need to use the **Xteink Unlocker** tool available at
-https://crosspointreader.com/#unlock-tool before you can flash CrossPoint.
-
-**You do not need this tool if you bought your device directly from xteink.com.** Those units are not locked.
-
-**Not sure if your device is locked?** Power it on, connect the USB-C cable, and try flashing via the web flasher first (see
-[Install firmware](#install-firmware) below). If the browser's serial device picker does not show your device, try a different
-USB port or browser before assuming the device is locked. Only reach for the unlocker if the device still doesn't appear.
-
-> ### ⚠️ WARNING: READ THIS BEFORE USING THE UNLOCKER ⚠️
-> 
-> **The only officially supported firmwares in the unlock tool are CrossPoint and CrossInk.**
-> 
-> Flashing any other firmware on a USB-locked device may **permanently brick the device** or leave it **permanently
-> stuck on that firmware with no recovery path**. Once USB flashing is re-locked, your only way back is via OTA, and if
-> the firmware you flashed doesn't support OTA, **there is no way out**.
-> 
-> **The Papyrix fork has removed OTA update support from its code.** If you flash Papyrix onto a
-> USB-locked unit, you will have **zero update or recovery path** and will be stuck on it forever. **Do not flash
-> Papyrix (or any other unsupported firmware) on a locked device.**
-
-## Install firmware
-
-### Web installer (recommended)
-
-1. Connect your device to your computer via USB-C and wake/unlock the device
-2. Go to https://crosspointreader.com/#flash-tools, select device (X3 or X4), and choose an official CrossPoint release.
-
-### Web installer (specific version)
-
-1. Connect your device to your computer via USB-C and wake/unlock the device
-2. Download a `firmware.bin` from [Releases](https://github.com/crosspoint-reader/crosspoint-reader/releases), local build, or continuous integration artifact.
-3. Go to https://crosspointreader.com/#flash-tools, select device (X3 or X4), click "Custom .bin" and upload a `firmware.bin`.
-
-### Revert to Official Firmware
-
-To revert to the official firmware, you can also flash the latest official firmware using https://crosspointreader.com/#flash-tools.
-
-### Command line
-
-1. Install [`esptool`](https://github.com/espressif/esptool):
+### Cách 2 — esptool (manual)
 
 ```bash
 pip install esptool
+esptool.py --chip esp32c3 --port /dev/ttyACM0 --baud 921600 \
+    write_flash 0x10000 firmware.bin
 ```
 
-2. Download `firmware.bin` from the [releases page](https://github.com/crosspoint-reader/crosspoint-reader/releases).
-3. Connect your device via USB-C.
-4. Find the device port. On Linux, run `dmesg` after connecting. On macOS:
+Thay `/dev/ttyACM0` bằng device của máy bạn (Linux: chạy `dmesg` sau khi cắm USB).
+
+## Sau khi flash
+
+1. Boot lên, vào **Settings → Language**, chọn **Tiếng Việt**.
+2. (Khuyến nghị) Muốn đọc sách tiếng Việt đẹp hơn? Nạp thêm font Unicode có dấu vào SD bằng SD-card font builder chính thức:
+   - Vào <https://crosspointreader.com/fonts>, mở form **"SD-card font builder"**.
+   - Upload tối đa 4 style (regular, bold, italic, bold-italic), đặt tên family, point size, Unicode range.
+   - Tải các file `.cpfont` về, copy vào SD card thư mục `/fonts/TenFont/` (hoặc `/.fonts/TenFont/` để ẩn).
+   - Reboot, chọn font trong **Settings → Font**.
+
+## Rollback về firmware stock
+
+Vào <https://crosspointreader.com/#flash-tools>, chọn máy (X3/X4) và flash lại firmware official.
+
+## Nguồn gốc & Credits
+
+Fork này tổng hợp:
+
+- **Base:** [`crosspoint-reader/crosspoint-reader`](https://github.com/crosspoint-reader/crosspoint-reader) — firmware CrossPoint gốc (MIT License), rebase lên **release 1.3.0** (upstream master, commit [`2dd491b`](https://github.com/crosspoint-reader/crosspoint-reader/commit/2dd491b)).
+- **Vietnamese i18n:** cherry-pick từ [`danoooob/crosspoint-reader-vi`](https://github.com/danoooob/crosspoint-reader-vi) bởi [@danoooob](https://github.com/danoooob) — bản dịch 292 chuỗi.
+- **Font UbuntuVietHoa:** HoangDesign / DesignerViet ([designerviet.com](https://designerviet.com)) — font Ubuntu Việt hóa.
+
+Khác biệt so với `danoooob/crosspoint-reader-vi`:
+
+- Target **cả Xteink X3 lẫn X4** (danoooob build chủ yếu cho X4; upstream 1.3.0 nay hỗ trợ chính thức cả hai panel).
+- Dựa trên upstream mới hơn (release 1.3.0, bao gồm SD-card fonts, tilt page turn cho X3, OPDS/WebDAV, và nhiều fix khác).
+- Giữ đủ 22 ngôn ngữ upstream + thêm tiếng Việt.
+- Có thêm patch sleep-screen crop/scale chưa có trong upstream (xem bên dưới).
+
+Bản upstream gốc (tiếng Anh) được giữ nguyên tại [README-UPSTREAM.md](./README-UPSTREAM.md).
+
+## Patches riêng của fork này
+
+Những fix tôi tự phát hiện và vá thêm so với upstream `crosspoint-reader`. Đã submit upstream PR để các fork khác cùng hưởng.
+
+### Fix: Sleep screen không fill đủ màn hình (X3 & X4)
+
+**Hiện tượng:** Đặt một `sleep.bmp` kích thước của panel này lên máy có panel kia — ví dụ ảnh 480×800 (chuẩn X4) trên X3 (528×792) ở chế độ `Cover Mode: CROP` → ảnh bị render ở góc trái trên với tỉ lệ 1:1 pixel, chừa viền trống bên phải/dưới. Đúng ra ở CONTAIN/CROP phải scale lên cho vừa màn hình. Lỗi đối xứng cho cả hai chiều: ảnh nhỏ hơn panel ở bất kỳ chiều nào đều không được upscale.
+
+**Nguyên nhân (3 bug cộng dồn trong render path):**
+
+1. `SleepActivity::renderBitmapSleepScreen()` chỉ vào branch scale/crop khi bitmap **lớn hơn** màn hình ở ít nhất một chiều. Ảnh nhỏ hơn panel → rơi vào branch "center only" không hề scale.
+2. `GfxRenderer::drawBitmap()` chỉ áp dụng scaling khi `fitScale < 1.0` (chỉ downscale). Yêu cầu upscale bị bỏ qua âm thầm.
+3. Render loop iterate source pixel và map 1:1 sang dest pixel. Khi upscale, loop để lại dòng/cột trống giữa các source row/col (nearest-neighbor artifact).
+
+**Fix:**
+
+- Trigger scale/crop khi `bitmap size != screen size` (không chỉ khi lớn hơn).
+- Thêm flag `allowUpscale` vào `drawBitmap()` (default `false`). Chỉ `SleepActivity` opt-in. BmpViewer, cover thumbnails, Lyra themes giữ nguyên hành vi 1:1 centering như upstream.
+- Bypass 1-bit fast path `drawBitmap1Bit()` khi `allowUpscale=true` → ảnh 1-bit cũng được upscale đúng.
+- Thay render loop 1:1 bằng **dest-span fill** (nearest-neighbor block): mỗi source pixel ghi ra span `[floor(idx*scale), floor((idx+1)*scale) - 1]`. Khi `scale ≤ 1.0` span = 1, nên hành vi downscale / no-scale không đổi, bit-for-bit giống upstream.
+
+**Áp dụng cho cả hai máy:** ảnh X4 480×800 → X3 528×792 (CROP) giờ render full 528×792; tương tự ảnh X3 528×792 → X4 480×800 cũng fill đúng. Không còn viền trống (đúng cả 2-bit greyscale lẫn 1-bit monochrome).
+
+> Behavior change nhỏ: user có `/sleep/*.bmp` nhỏ hơn panel (trước đây render 1:1 centered) giờ sẽ thấy ảnh scale lên fill panel ở CONTAIN/CROP. Đúng semantics của 2 mode đó, nhưng khác hành vi cũ.
+
+Commits: [`10aeb6f`](../../commit/10aeb6f) + [`1740fdc`](../../commit/1740fdc) + [`7f03723`](../../commit/7f03723) • Files: `lib/GfxRenderer/GfxRenderer.{h,cpp}`, `src/activities/boot_sleep/SleepActivity.cpp`.
+
+Upstream PR: [crosspoint-reader/crosspoint-reader#1716](https://github.com/crosspoint-reader/crosspoint-reader/pull/1716) — chưa merge vào 1.3.0 (lỗi vẫn còn trên bản chính thức), nên fork vẫn giữ patch.
+
+## Build từ source
+
+Yêu cầu: Python 3.8+, PlatformIO Core (pioarduino), `clang-format` 21, USB-C cable.
 
 ```bash
-log stream --predicate 'subsystem == "com.apple.iokit"' --info
-```
-
-5. Flash:
-
-```bash
-esptool.py --chip esp32c3 --port /dev/ttyACM0 --baud 921600 write_flash 0x10000 /path/to/firmware.bin
-```
-
-Adjust `/dev/ttyACM0` to match your system.
-
-### Manual
-
-See [Development quick start](#development-quick-start) below.
-
----
-
-## Custom SD-card fonts
-
-Convert your own TTF/OTF files into `.cpfont` files that load from the SD card. No firmware reflash is needed.
-
-1. Go to https://crosspointreader.com/fonts and open the "SD-card font builder" form.
-2. Upload up to four styles (regular, bold, italic, bold-italic), set the family name, point sizes, and Unicode range.
-3. Download the generated `.cpfont` files.
-4. Copy them to your SD card under `/fonts/YourFont/` (or `/.fonts/YourFont/` to hide the folder).
-5. Select the font on the device from the font settings.
-
-Conversion runs the firmware repo's `lib/EpdFont/scripts/fontconvert_sdcard.py` script unmodified, so output matches a local host build.
-
----
-
-## Documentation
-
-- [User Guide](./USER_GUIDE.md)
-- [Web server usage](./docs/webserver.md)
-- [Web server endpoints](./docs/webserver-endpoints.md)
-- [Project scope](./SCOPE.md)
-- [Contributing docs](./docs/contributing/README.md)
-
----
-
-## Development quick start
-
-### Prerequisites
-
-- [pioarduino](https://github.com/pioarduino/pioarduino) or VS Code + pioarduino plugin
-- Python 3.8+
-- `clang-format` 21
-- USB-C cable supporting data transfer
-
-### Setup
-
-```bash
-git clone --recursive https://github.com/crosspoint-reader/crosspoint-reader
-cd crosspoint-reader
-
-# if cloned without --recursive:
+git clone --recursive https://github.com/giangthb/crosspoint-reader-x3-x4-vi.git
+cd crosspoint-reader-x3-x4-vi
 git submodule update --init --recursive
+pio run -e gh_release
+# Output: .pio/build/gh_release/firmware.bin
 ```
 
-### Build / flash / monitor
+## License
 
-```bash
-pio run --target upload
-```
+MIT License — kế thừa từ upstream `crosspoint-reader/crosspoint-reader`. Xem [LICENSE](./LICENSE).
 
-### Contributor pre-PR checks
+Font UbuntuVietHoa thuộc về HoangDesign / DesignerViet, phân phối theo tinh thần cộng đồng. Font Ubuntu gốc: Ubuntu Font License.
 
-```bash
-./bin/clang-format-fix
-pio check -e default
-pio run -e default
-```
+## Disclaimer
 
-### Debugging
-
-After flashing the new features, it’s recommended to capture detailed logs from the serial port.
-
-First, make sure all required Python packages are installed:
-
-```python
-python3 -m pip install pyserial colorama matplotlib
-```
-
-After that run the script:
-
-```sh
-# For Linux
-# This was tested on Debian and should work on most Linux systems.
-python3 scripts/debugging_monitor.py
-
-# For macOS
-python3 scripts/debugging_monitor.py /dev/cu.usbmodem2101
-```
-
-Minor adjustments may be required for Windows.
+Project này **không liên kết với Xteink**. Firmware được build bởi cộng đồng, không có bảo hành. Flash sai có thể brick thiết bị. Luôn backup partition trước khi thử firmware mới.
 
 ---
 
-## Internals
-
-CrossPoint Reader is pretty aggressive about caching data down to the SD card to minimise RAM usage. The ESP32-C3 only has ~380KB of usable RAM, so we have to be careful. A lot of the decisions made in the design of the firmware were based on this constraint.
-
-### Data caching
-
-The first time chapters of a book are loaded, they are cached to the SD card. Subsequent loads are served from the 
-cache. This cache directory exists at `.crosspoint` on the SD card. The structure is as follows:
-
-```text
-.crosspoint/
-├── epub_<hash>/         # one directory per book, named by content hash
-│   ├── progress.bin     # reading position (chapter, page, etc.)
-│   ├── cover.bmp        # generated cover image
-│   ├── book.bin         # metadata: title, author, spine, TOC
-│   └── sections/        # per-chapter layout cache
-│       ├── 0.bin
-│       ├── 1.bin
-│       └── ...
-```
-
-Removing `/.crosspoint` clears all cached metadata and forces a full regeneration on next open. Note: the cache isn't cleared automatically when you delete a book, and moving a file to a new path resets its reading progress.
-
-For more details on the internal file structures, see the [file formats document](./docs/file-formats.md).
-
----
-
-## Contributing
-
-Contributions are welcome. If you're new to the codebase, start with the [contributing docs](./docs/contributing/README.md). For things to work on, check the [ideas discussion board](https://github.com/crosspoint-reader/crosspoint-reader/discussions/categories/ideas) — leave a comment before starting so we don't duplicate effort.
-
-Everyone here is a volunteer, so please be respectful and patient. For governance and community expectations, see [GOVERNANCE.md](./GOVERNANCE.md).
-
----
-
-## Community forks
-
-One of the best things about open source is that anyone can take the code in a different direction. If you need something outside CrossPoint's [scope](./SCOPE.md), check out the community forks:
-
-- [CrossInk](https://github.com/uxjulia/CrossInk) — Typography and reading tracking: Bionic Reading (bolds word stems to create fixation points), guide dots between words, improved paragraph indents, and replaces the default fonts with ChareInk/Lexend/Bitter.
-
-- [papyrix-reader](https://github.com/bigbag/papyrix-reader) — Adds FB2 and MD format support. Actively maintained with Arabic script support. Custom themes via SD card.
-
-- [crosspet](https://github.com/trilwu/crosspet) — A Vietnamese fork that adds a Tamagotchi-style virtual chicken that grows based on your reading milestones (pages read, streaks, care). Also: Flashcards, Weather, Pomodoro timer, and mini-games.
-
-- [crosspoint-reader (jpirnay)](https://github.com/jpirnay/crosspoint-reader) — Faster integration of functionality. Tracks upstream PRs and integrates the good ones ahead of the official merge.
-
-- [crosspoint-reader-cjk](https://github.com/aBER0724/crosspoint-reader-cjk) — Purpose-built for Chinese, Japanese, and Korean reading.
-
-- [inx](https://github.com/obijuankenobiii/inx) — Completely reimagines the user interface with tabbed navigation.
-
-- ~~[PlusPoint](https://github.com/ngxson/pluspoint-reader) — custom JS apps support.~~ (Unmaintained)
-
-- [crosspoint-reader-papers3](https://github.com/juicecultus/crosspoint-reader-papers3) — Crosspoint port for M5Stack Paper S3. 
-
-**Note:** Many of these features will make their way into CrossPoint over time. We maintain a slower pace to ensure rock-solid stability and squash bugs before they reach your device.
-
-Want to build your own device? Be sure to check out the [de-link](https://github.com/iandchasse/de-link) project.
-
----
-
-CrossPoint Reader is **not affiliated with Xteink or any device manufacturer**.
-
-Huge shoutout to [diy-esp32-epub-reader](https://github.com/atomic14/diy-esp32-epub-reader), which inspired this project.
+Góp ý / issue: mở [issue](../../issues) hoặc PR.
