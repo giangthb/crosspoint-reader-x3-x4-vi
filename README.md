@@ -6,17 +6,16 @@ Firmware CrossPoint cho máy đọc sách **Xteink X3 và X4** với hỗ trợ 
 
 ## Điểm đặc biệt
 
-- ✅ **UI tiếng Việt** — 292 chuỗi đã dịch (menu, settings, dialog, thông báo). Upstream có 22 ngôn ngữ nhưng **chưa có tiếng Việt** — đây là điểm khác biệt chính của fork.
-- ✅ **Font UbuntuVietHoa** — hiển thị đủ dấu tiếng Việt ngay trên giao diện (không cần copy font vào SD).
-- ✅ **Hỗ trợ cả X3 lẫn X4** — base trên upstream `crosspoint-reader` 1.3.0, đã hỗ trợ chính thức **cả hai panel**: X4 (480×800) và X3 (528×792). Một bản firmware chạy cho cả hai máy.
-- ✅ **Đa ngôn ngữ** — ngoài tiếng Việt, giữ đủ 22 ngôn ngữ của upstream (EN, ES, FR, DE, IT, PT, RU, UK, PL, TR, ...) → tổng 23 ngôn ngữ.
-- ✅ **Patch riêng:** fix sleep screen không fill đủ màn hình khi dùng ảnh kích thước panel khác (X4 trên X3 hoặc ngược lại) — xem [Patches](#patches-riêng-của-fork-này). User xác nhận lỗi này **vẫn còn trên 1.3.0**, nên patch vẫn cần.
+- ✅ **UI và font tiếng Việt native** — kế thừa bản dịch và glyph coverage chính thức từ upstream 1.4.1; không còn thay thế Spanish hoặc dùng bộ Ubuntu Việt hóa ngoài upstream.
+- ✅ **Hỗ trợ cả X3 lẫn X4** — một firmware chạy trên X4 (480×800) và X3 (528×792).
+- ✅ **Đa ngôn ngữ** — giữ nguyên toàn bộ 24 ngôn ngữ và RTL support của upstream.
+- ✅ **Patch riêng:** fix sleep screen không fill đủ màn hình khi dùng ảnh kích thước panel khác (X4 trên X3 hoặc ngược lại) — xem [Patches](#patches-riêng-của-fork-này). Upstream PR #1716 đã đóng nhưng không merge; lỗi vẫn còn trong 1.4.1.
 
-### Tính năng mới kế thừa từ upstream 1.3.0
+### Tính năng kế thừa từ upstream 1.4.1
 
 - **SD-card fonts (`.cpfont`)** — tự convert TTF/OTF thành font load từ SD, không cần reflash firmware (xem [Sau khi flash](#sau-khi-flash)).
 - **Tilt page turn (chỉ X3)** — lật trang bằng nghiêng máy.
-- **KOReader progress sync**, **WebDAV**, **OPDS browser** (tối đa 8 server, search, phân trang, tải trực tiếp).
+- **KOReader progress sync**, bookmark, focus reading, **WebDAV**, **OPDS browser** (tối đa 8 server, search, phân trang, tải trực tiếp).
 - **OTA update** từ GitHub releases, **EPUB Optimizer**, **WebSocket fast uploads**.
 - Nhiều theme (Classic, Lyra, Lyra Extended, RoundedRaff), remap nút trước/bên, điều khiển status bar.
 
@@ -58,20 +57,9 @@ Vào <https://crosspointreader.com/#flash-tools>, chọn máy (X3/X4) và flash 
 
 ## Nguồn gốc & Credits
 
-Fork này tổng hợp:
+Fork này dựa trên [`crosspoint-reader/crosspoint-reader`](https://github.com/crosspoint-reader/crosspoint-reader) **release 1.4.1** (MIT License), giữ nguyên Vietnamese i18n và font coverage chính thức của upstream. Khác biệt duy nhất trong firmware là patch sleep-screen crop/scale bên dưới; ngoài ra fork duy trì workflow build/release và upstream-watch riêng.
 
-- **Base:** [`crosspoint-reader/crosspoint-reader`](https://github.com/crosspoint-reader/crosspoint-reader) — firmware CrossPoint gốc (MIT License), rebase lên **release 1.3.0** (upstream master, commit [`2dd491b`](https://github.com/crosspoint-reader/crosspoint-reader/commit/2dd491b)).
-- **Vietnamese i18n:** cherry-pick từ [`danoooob/crosspoint-reader-vi`](https://github.com/danoooob/crosspoint-reader-vi) bởi [@danoooob](https://github.com/danoooob) — bản dịch 292 chuỗi.
-- **Font UbuntuVietHoa:** HoangDesign / DesignerViet ([designerviet.com](https://designerviet.com)) — font Ubuntu Việt hóa.
-
-Khác biệt so với `danoooob/crosspoint-reader-vi`:
-
-- Target **cả Xteink X3 lẫn X4** (danoooob build chủ yếu cho X4; upstream 1.3.0 nay hỗ trợ chính thức cả hai panel).
-- Dựa trên upstream mới hơn (release 1.3.0, bao gồm SD-card fonts, tilt page turn cho X3, OPDS/WebDAV, và nhiều fix khác).
-- Giữ đủ 22 ngôn ngữ upstream + thêm tiếng Việt.
-- Có thêm patch sleep-screen crop/scale chưa có trong upstream (xem bên dưới).
-
-Bản upstream gốc (tiếng Anh) được giữ nguyên tại [README-UPSTREAM.md](./README-UPSTREAM.md).
+README và lịch sử upstream gốc: [`crosspoint-reader/crosspoint-reader`](https://github.com/crosspoint-reader/crosspoint-reader).
 
 ## Patches riêng của fork này
 
@@ -100,7 +88,7 @@ Những fix tôi tự phát hiện và vá thêm so với upstream `crosspoint-r
 
 Commits: [`10aeb6f`](../../commit/10aeb6f) + [`1740fdc`](../../commit/1740fdc) + [`7f03723`](../../commit/7f03723) • Files: `lib/GfxRenderer/GfxRenderer.{h,cpp}`, `src/activities/boot_sleep/SleepActivity.cpp`.
 
-Upstream PR: [crosspoint-reader/crosspoint-reader#1716](https://github.com/crosspoint-reader/crosspoint-reader/pull/1716) — chưa merge vào 1.3.0 (lỗi vẫn còn trên bản chính thức), nên fork vẫn giữ patch.
+Upstream PR: [crosspoint-reader/crosspoint-reader#1716](https://github.com/crosspoint-reader/crosspoint-reader/pull/1716) — đã đóng nhưng không merge; kiểm tra source 1.4.1 xác nhận renderer vẫn chỉ áp dụng `fitScale < 1.0`, nên fork vẫn cần patch.
 
 ## Build từ source
 
@@ -116,9 +104,7 @@ pio run -e gh_release
 
 ## License
 
-MIT License — kế thừa từ upstream `crosspoint-reader/crosspoint-reader`. Xem [LICENSE](./LICENSE).
-
-Font UbuntuVietHoa thuộc về HoangDesign / DesignerViet, phân phối theo tinh thần cộng đồng. Font Ubuntu gốc: Ubuntu Font License.
+MIT License — kế thừa từ upstream `crosspoint-reader/crosspoint-reader`. Xem [LICENSE](./LICENSE). Các font đi kèm giữ nguyên license từ upstream.
 
 ## Disclaimer
 
